@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0a0c11"><title>PTCU | حجز Topics</title>
+<style>
+:root{--bg:#0a0c11;--panel:#151923;--gold:#d8b66c;--muted:#aab1bf;--line:#2b3241;--green:#45c995;--red:#ff747c}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#1b2232,var(--bg) 60%);color:#f6f7fa;font-family:Tahoma,Arial,sans-serif}
+header{text-align:center;padding:30px 15px 24px;border-bottom:1px solid var(--line)}.brand{display:inline-block;color:var(--gold);border:1px solid #665535;border-radius:9px;padding:7px 14px;font-size:12px}
+h1{font-size:clamp(25px,4vw,38px);margin:15px 0 8px}header p{color:var(--muted);line-height:1.8;margin:0}.wrap{max-width:1150px;margin:auto;padding:20px 14px 45px}
+.notice{background:#211f18;border:1px solid #665535;color:#f0d9a6;padding:13px 15px;border-radius:12px;line-height:1.9;font-size:14px}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin:17px 0}.search{flex:1;min-width:190px;background:var(--panel);color:white;border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit}.btn{font:inherit;font-weight:bold;border:0;border-radius:10px;padding:11px 14px;cursor:pointer}.primary{background:var(--gold);color:#17130b}.secondary{background:#1d2330;color:white;border:1px solid var(--line)}
+.topics{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,315px),1fr));gap:15px}.topic{background:linear-gradient(145deg,#171c27,#11151d);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}.top{display:flex;gap:10px;align-items:flex-start}.num{display:grid;place-items:center;min-width:38px;height:38px;border-radius:10px;background:#30291b;color:var(--gold);font-weight:bold}.topic h2{font-size:16px;line-height:1.6;margin:2px 0 7px}.status{font-size:12px;border-radius:30px;padding:5px 9px;white-space:nowrap;margin-right:auto}.open{background:#14372c;color:#83e5ba}.closed{background:#432329;color:#ffb0b5}.teams{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:14px 0}.team{border:1px solid var(--line);border-radius:9px;text-align:center;padding:9px 2px;background:#10141c}.team b{display:block;color:var(--gold);font-size:12px}.team span{display:block;color:var(--muted);font-size:11px;margin-top:5px}.bar{height:5px;background:#292f3d;border-radius:10px;overflow:hidden;margin:9px 0 13px}.bar i{display:block;height:100%;background:var(--green)}.book{width:100%}.book:disabled{background:#353a45;color:#858b97;cursor:not-allowed}.muted{color:var(--muted);font-size:12px;line-height:1.8}.empty{text-align:center;color:var(--muted);padding:30px;display:none}
+.modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:16px;z-index:5}.modal.show{display:flex}.dialog{background:#171c27;border:1px solid #3a4253;border-radius:17px;padding:22px;width:min(100%,430px)}.dialog h2{margin:0 0 6px}.dialog p{color:var(--muted);line-height:1.7;font-size:14px}.field{display:block;margin:13px 0}.field span{display:block;margin-bottom:7px;font-size:13px}.field input,.field select{width:100%;padding:12px;background:#0e1219;border:1px solid var(--line);border-radius:9px;color:white;font:inherit}.actions{display:flex;gap:8px;margin-top:18px}.actions button{flex:1}.message{margin:12px 0;padding:11px;border-radius:9px;display:none;line-height:1.7}.error{background:#3a2026;color:#ffb7bd}.success{background:#14372c;color:#83e5ba}footer{text-align:center;color:var(--muted);font-size:12px;padding:0 15px 28px}
+</style>
+</head>
+<body>
+<header><div class="brand">PTCU • TOPIC BOOKING</div><h1>حجز Topics الأسايمنت</h1><p>اختار التوبيك والتيم المناسب ليك — كل تيم مكوّن من 5 أفراد</p></header>
+<main class="wrap">
+<div class="notice">📌 كل Topic فيه 5 Teams، وكل Team فيه 5 أماكن. الحجز مشترك بين كل الطلاب، والمكان بيتحجز مرة واحدة فقط. التوبيك بيقفل تلقائيًا بعد اكتمال 25 طالبًا.</div>
+<div class="toolbar"><input class="search" id="search" placeholder="ابحث عن Topic..."><button class="btn secondary" id="refresh">تحديث الحجوزات</button></div>
+<div id="globalMsg" class="message"></div><div class="topics" id="topics"></div><div class="empty" id="empty">مفيش Topics مطابقة للبحث.</div>
+</main><footer>حجز دفعة العلاج الطبيعي • Cairo University</footer>
+<div class="modal" id="modal"><div class="dialog"><h2>تأكيد الحجز</h2><p id="chosen"></p><div id="formMsg" class="message"></div><form id="bookingForm">
+<label class="field"><span>الاسم بالكامل</span><input id="studentName" required maxlength="80" autocomplete="name" placeholder="اكتب اسمك"></label>
+<label class="field"><span>الرقم الجامعي</span><input id="studentId" required maxlength="30" autocomplete="off" placeholder="اكتب الرقم الجامعي"></label>
+<label class="field"><span>اختار التيم</span><select id="teamSelect" required></select></label>
+<div class="actions"><button type="button" class="btn secondary" id="cancel">إلغاء</button><button class="btn primary" id="submitBtn" type="submit">تأكيد الحجز</button></div>
+</form></div></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, doc, runTransaction, onSnapshot, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// 1) استبدل القيم ببيانات مشروع Firebase الخاص بك من إعدادات Web App.
+const firebaseConfig = {
+  apiKey: "PASTE_API_KEY_HERE",
+  authDomain: "PASTE_PROJECT_ID_HERE.firebaseapp.com",
+  projectId: "PASTE_PROJECT_ID_HERE",
+  storageBucket: "PASTE_PROJECT_ID_HERE.appspot.com",
+  messagingSenderId: "PASTE_SENDER_ID_HERE",
+  appId: "PASTE_APP_ID_HERE"
+};
+const topicNames=[
+"Spinal poliomyelitis","Syringomyelia","Upper motor neuron lesion vs lower motor neuron lesion","Hydrocephalus","Cerebellar ataxia","Parkinsonism","Thalamic syndrome","Cerebrovascular stroke","Epilepsy","Cerebral palsy","Facial palsy","Aphasia","Lateral medullary syndrome vs medial medullary syndrome","Disorders of increased activity of basal ganglia (Dystonia, hemiballismus, Huntington's chorea)"
+];
+const $=id=>document.getElementById(id);let db, activeTopic=null, counts={}, myBookings=[];
+const configReady=Object.values(firebaseConfig).every(v=>v&&!v.startsWith("PASTE_"));
+function msg(el,text,type='error'){el.textContent=text;el.className='message '+type;el.style.display='block'}
+function hideMsg(el){el.style.display='none'}
+function showGlobal(text){msg($('globalMsg'),text,'error')}
+if(!configReady){showGlobal('لسه لازم تضيف إعدادات Firebase في ملف index.html قبل النشر. اتبع ملف README المرفق.');render();$('refresh').disabled=true}
+else {
+ try {
+  const app=initializeApp(firebaseConfig);db=getFirestore(app);
+  // Live subscription to all confirmed bookings.
+  onSnapshot(collection(db,'bookings'),snap=>{
+    counts={};myBookings=[];
+    snap.forEach(d=>{const b=d.data();counts[b.topicIndex]??=Array(5).fill(0);counts[b.topicIndex][b.teamIndex]++;myBookings.push({...b,id:d.id});});
+    render();
+  },err=>showGlobal('تعذر تحميل الحجوزات. راجع إعدادات Firebase وقواعد Firestore. ('+err.code+')'));
+ } catch(e){showGlobal('إعدادات Firebase غير صحيحة. راجع README.')}
+}
+function teamCount(t,j){return counts[t]?.[j]||0}
+function topicCount(t){return Array.from({length:5},(_,j)=>teamCount(t,j)).reduce((a,b)=>a+b,0)}
+function render(){
+ const q=$('search').value.trim().toLowerCase();let visible=0;
+ $('topics').innerHTML=topicNames.map((name,i)=>{
+ if(!name.toLowerCase().includes(q))return '';visible++;
+ const total=topicCount(i),closed=total>=25;
+ const teams=Array.from({length:5},(_,j)=>`<div class="team"><b>Team ${j+1}</b><span>${teamCount(i,j)}/5</span></div>`).join('');
+ return `<article class="topic"><div class="top"><div class="num">${String(i+1).padStart(2,'0')}</div><div style="flex:1"><h2>${name}</h2><div class="muted">${total}/25 مكان محجوز</div></div><span class="status ${closed?'closed':'open'}">${closed?'مكتمل':'متاح'}</span></div><div class="bar"><i style="width:${total/25*100}%"></i></div><div class="teams">${teams}</div><button class="btn primary book" ${(!db||closed)?'disabled':''} data-topic="${i}">${closed?'اكتمل الحجز':(!db?'إعداد الموقع مطلوب':'احجز في هذا التوبيك')}</button></article>`;
+ }).join('');
+ $('empty').style.display=visible?'none':'block';
+ document.querySelectorAll('[data-topic]').forEach(b=>b.addEventListener('click',()=>openBooking(Number(b.dataset.topic))));
+}
+function openBooking(i){
+ activeTopic=i;$('chosen').textContent='Topic: '+topicNames[i];hideMsg($('formMsg'));
+ const options=Array.from({length:5},(_,j)=>j).filter(j=>teamCount(i,j)<5);
+ $('teamSelect').innerHTML=options.map(j=>`<option value="${j}">Team ${j+1} — ${teamCount(i,j)}/5 أفراد</option>`).join('');
+ if(topicCount(i)>=25||!options.length){alert('التوبيك أو كل تيماته اكتملت.');return}
+ $('modal').classList.add('show');
+}
+$('cancel').onclick=()=>$('modal').classList.remove('show');
+$('search').addEventListener('input',render);
+$('refresh').onclick=()=>{render();msg($('globalMsg'),'الأرقام المعروضة متزامنة تلقائيًا مع قاعدة البيانات.','success')};
+$('bookingForm').addEventListener('submit',async e=>{
+ e.preventDefault();if(!db)return;
+ const name=$('studentName').value.trim(),studentId=$('studentId').value.trim(),teamIndex=Number($('teamSelect').value);
+ if(!name||!studentId)return;
+ $('submitBtn').disabled=true;$('submitBtn').textContent='جارٍ الحجز...';hideMsg($('formMsg'));
+ // Hash the student number so it is not stored as a document ID in plain text.
+ const encoder=new TextEncoder();const bytes=await crypto.subtle.digest('SHA-256',encoder.encode(studentId.toLowerCase()));
+ const idHash=Array.from(new Uint8Array(bytes)).map(b=>b.toString(16).padStart(2,'0')).join('');
+ const bookingRef=doc(db,'bookings',idHash);
+ try{
+  await runTransaction(db,async tx=>{
+   const prior=await tx.get(bookingRef);
+   if(prior.exists())throw new Error('DUPLICATE');
+   const snap=await tx.get(collection(db,'bookings'));
+   const all=snap.docs.map(d=>d.data());
+   const currentTopic=all.filter(b=>b.topicIndex===activeTopic);
+   if(currentTopic.length>=25)throw new Error('TOPIC_FULL');
+   if(currentTopic.filter(b=>b.teamIndex===teamIndex).length>=5)throw new Error('TEAM_FULL');
+   tx.set(bookingRef,{topicIndex:activeTopic,topicName:topicNames[activeTopic],teamIndex,studentName:name,studentIdHash:idHash,createdAt:new Date().toISOString()});
+  });
+  $('modal').classList.remove('show');$('bookingForm').reset();msg($('globalMsg'),'تم تأكيد الحجز بنجاح. هتظهر الأرقام المحدثة لكل الطلاب.','success');
+ }catch(err){
+  const m=err.message==='DUPLICATE'?'الرقم الجامعي مسجل بالفعل بحجز.':err.message==='TOPIC_FULL'?'التوبيك اكتمل للتو. اختار Topic آخر.':err.message==='TEAM_FULL'?'التيم اكتمل للتو. اختار تيم آخر.':'لم يتم الحجز. تأكد من إعدادات Firebase وقواعد قاعدة البيانات ثم حاول مرة أخرى.';
+  msg($('formMsg'),m,'error');
+ }finally{$('submitBtn').disabled=false;$('submitBtn').textContent='تأكيد الحجز'}
+});
+render();
+</script></body></html>
