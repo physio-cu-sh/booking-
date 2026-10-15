@@ -32,14 +32,23 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getFirestore, collection, doc, runTransaction, onSnapshot, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // 1) استبدل القيم ببيانات مشروع Firebase الخاص بك من إعدادات Web App.
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "PASTE_API_KEY_HERE",
-  authDomain: "PASTE_PROJECT_ID_HERE.firebaseapp.com",
-  projectId: "PASTE_PROJECT_ID_HERE",
-  storageBucket: "PASTE_PROJECT_ID_HERE.appspot.com",
-  messagingSenderId: "PASTE_SENDER_ID_HERE",
-  appId: "PASTE_APP_ID_HERE"
+  apiKey: "AIzaSyCNiVCH7aJH8fR7MaVDQQiwNvRBThZHR30",
+  authDomain: "ptcu-topic.firebaseapp.com",
+  projectId: "ptcu-topic",
+  storageBucket: "ptcu-topic.firebasestorage.app",
+  messagingSenderId: "897142363432",
+  appId: "1:897142363432:web:6c222cd2dba85c7f50ac1d"
 };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 const topicNames=[
 "Spinal poliomyelitis","Syringomyelia","Upper motor neuron lesion vs lower motor neuron lesion","Hydrocephalus","Cerebellar ataxia","Parkinsonism","Thalamic syndrome","Cerebrovascular stroke","Epilepsy","Cerebral palsy","Facial palsy","Aphasia","Lateral medullary syndrome vs medial medullary syndrome","Disorders of increased activity of basal ganglia (Dystonia, hemiballismus, Huntington's chorea)"
 ];
